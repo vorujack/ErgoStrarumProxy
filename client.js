@@ -126,7 +126,7 @@ let options = {
 
 function doConnect() {
     if(parameters.client){
-        parameters.client.destroy()
+        parameters.client.shutdown();
     }
     parameters.client = client(options);
 }
