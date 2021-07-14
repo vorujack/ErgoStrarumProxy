@@ -4,6 +4,7 @@ const BigInt = require("big-integer");
 const chalk = require('chalk');
 const {ArgumentParser} = require('argparse');
 const {version} = require('./package.json');
+const q = new BigInt('115792089237316195423570985008687907852837564279074904382605163141518161494337');
 
 const parser = new ArgumentParser({
     description: 'Ergo Stratum mining pool\'s proxy'
@@ -151,7 +152,13 @@ const handle_mining_candidate = (request, response) => {
             extraNonce2Size: job.extraNonce2Size,
             height: job.prevhash
         });
-        const b_value = BigInt(job.miningDiff).equals(BigInt(0)) ? BigInt(job.nbits) : (BigInt(job.nbits).minus(BigInt(1))).multiply(BigInt(job.miningDiff));
+        let b_value = BigInt(job.nbits);
+        if(BigInt(job.miningDiff).equals(BigInt(0))) {
+            const b = BigInt(job.nbits);
+            const networkDifficulty = q.divide(b);
+            const difficulty = networkDifficulty.multiply(this.miningDiff);
+            b_value = q.divide(difficulty);
+        }
         res = res.replace("\"<b_value>\"",
             b_value.toString()
         );
