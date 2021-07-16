@@ -156,8 +156,12 @@ const handle_mining_candidate = (request, response) => {
         if(BigInt(job.miningDiff).equals(BigInt(0))) {
             const b = BigInt(job.nbits);
             const networkDifficulty = q.divide(b);
-            const difficulty = networkDifficulty.multiply(this.miningDiff);
-            b_value = q.divide(difficulty);
+            if(networkDifficulty.lte(this.difficulty)){
+                b_value = q.toFixed(0)
+            }else {
+                const difficulty = networkDifficulty.dividedBy(this.difficulty);
+                b_value = q.dividedBy(difficulty).toFixed(0);
+            }
         }
         res = res.replace("\"<b_value>\"",
             b_value.toString()
